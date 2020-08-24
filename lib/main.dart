@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import "package:flutter_app/ExtensionProperty/ActivityNavigation.dart";
+import 'package:flutter_app/ExtensionProperty/ActivityNavigation.dart';
+import 'package:flutter_app/model/LoginBinding.dart';
+import 'package:flutter_app/model/BaseResponse.dart';
 import 'view/SecondRoute.dart';
 import 'package:toast/toast.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MaterialApp(home: MyApp()));
@@ -36,7 +41,15 @@ class _MyHomePageState extends State<MyHomePage> {
   String testSomething = "An dep trai";
   TextEditingController usernameController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
+  BaseResponse user;
+  LoginBinding loginBinding;
 
+  Future<http.Response> createAlbum() {
+    return http.post(
+      'https://api.ihp.dev.intelin.vn/user/login',
+      body: loginBinding.toJson(),
+    );
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -44,8 +57,37 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void getText(){
-    Toast.show("${usernameController.text} - ${passwordController.text}", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+  void getText() {
+    Toast.show(
+        "${usernameController.text} - ${passwordController.text}", context,
+        duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+  }
+
+  Future<void> login() async {
+    print("call api");
+    Toast.show("call api ne", context,
+        duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+    loginBinding = new LoginBinding(
+      username: usernameController.text,
+      password:
+          "cI1eVifkKE9E0P8lHOuWvhkOa3aSD+PFvcf8tFB/+pK9N8bjU33aw3hl7kgWuiZ5Y2lPDwvVELJjYtO4V6d8+ihtv4A5HhFnwbbg++E/yawmuJq4VV2LRoudBZ4rj1hmCAGu3BJqaJF0eZX6NAsmgN/NCpLRkQlSQkE3vviBd7F0Gvzsj7m5ER7G8jFN3bpqUASPUo6UhVBBLeLE+k/w0/0IT0NBlKOGidXoX2cb5HLgHx6q8+JO7llKPsI7WI1YGsYuEsqDbTxuEkpX+7ZHD+e9F94l7GIy5ujIRXt1yVD2cKTt9gGOHT2vKwI6Dcw6CTBYWJVVDPt5X0nG63YLcg==",
+    );
+    final http.Response response = await http.post(
+      'https://api.ihp.dev.intelin.vn/user/login',
+      body: loginBinding.toJson(),
+    );
+    if (response.statusCode == 200) {
+      print("call api response =  ${response.body}");
+      BaseResponse base = BaseResponse.fromJson(json.decode(response.body));
+      if (base.code == "LOGIN_2000") {
+        pushPage(context, SecondRoute());
+      }
+      print(base.data);
+    } else {
+      print("call api fail");
+      Toast.show("Error", context,
+          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+    }
   }
 
   @override
@@ -72,7 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: MediaQuery.of(context).size.height * 3 / 4,
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0), topRight: Radius.circular(15.0))),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15.0),
+                        topRight: Radius.circular(15.0))),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -80,34 +124,42 @@ class _MyHomePageState extends State<MyHomePage> {
                     Container(
                       margin: EdgeInsets.only(top: 50.0, left: 30, right: 30),
                       child: TextField(
-                        controller: usernameController,
-                        decoration: InputDecoration(focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.greenAccent, width: 1.0),),
-                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 1.0),),
-                            hintText: 'Enter username'),
-                          textInputAction: TextInputAction.next
-                      ),
+                          controller: usernameController,
+                          decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Colors.greenAccent, width: 1.0),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.red, width: 1.0),
+                              ),
+                              hintText: 'Enter username'),
+                          textInputAction: TextInputAction.next),
                     ),
                     Container(
                       margin: EdgeInsets.only(top: 50.0, left: 30, right: 30),
                       child: TextField(
                         controller: passwordController,
-                        decoration: InputDecoration(focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.greenAccent, width: 1.0),),
-                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 1.0),),
+                        decoration: InputDecoration(
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Colors.greenAccent, width: 1.0),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: Colors.red, width: 1.0),
+                            ),
                             hintText: 'Enter password'),
                         textInputAction: TextInputAction.done,
                       ),
                     ),
-                    _buildColumnBottom()
+                    _buildColumnBottom(),
                   ],
                 ),
               ),
             ]),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -121,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
         SizedBox(height: 30, width: 50),
         RaisedButton(
           onPressed: () {
-            getText();
+            login();
           },
           child: Text(
             "Test something",
@@ -131,5 +183,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ],
     );
+  }
+
+  Container buildText() {
+    return Container();
   }
 }
