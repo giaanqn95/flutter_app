@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/ExtensionProperty/ActivityNavigation.dart';
+import 'package:flutter_app/custom/CustomView.dart';
 import 'package:flutter_app/model/LoginBinding.dart';
 import 'package:flutter_app/model/BaseResponse.dart';
+import 'package:flutter_app/network_service/HttpService.dart';
+import 'network_service/KeyRequest.dart';
 import 'view/SecondRoute.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
@@ -65,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> login() async {
     print("call api");
+    String a = KeyExtensionMap.valuesMap[KeyRequest.GET_SOMETHING];
     Toast.show("call api ne", context,
         duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
     loginBinding = new LoginBinding(
@@ -123,36 +127,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Container(
                       margin: EdgeInsets.only(top: 50.0, left: 30, right: 30),
-                      child: TextField(
-                          controller: usernameController,
-                          decoration: InputDecoration(
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.greenAccent, width: 1.0),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.red, width: 1.0),
-                              ),
-                              hintText: 'Enter username'),
-                          textInputAction: TextInputAction.next),
+                      child: EditTextWidget(
+                          context: context,
+                          hint: "username",
+                          textEditingController: usernameController,
+                          keyboardType: TextInputType.number,
+                          iconStart: null,
+                          isPassword: false),
                     ),
                     Container(
                       margin: EdgeInsets.only(top: 50.0, left: 30, right: 30),
-                      child: TextField(
-                        controller: passwordController,
-                        decoration: InputDecoration(
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.greenAccent, width: 1.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.red, width: 1.0),
-                            ),
-                            hintText: 'Enter password'),
-                        textInputAction: TextInputAction.done,
-                      ),
+                      child: EditTextWidget(
+                          context: context,
+                          hint: "password",
+                          textEditingController: passwordController,
+                          keyboardType: TextInputType.text,
+                          iconStart: null,
+                          iconEnd: Icon(Icons.ac_unit),
+                          isPassword: true),
                     ),
                     _buildColumnBottom(),
                   ],
