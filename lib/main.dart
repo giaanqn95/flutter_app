@@ -5,11 +5,14 @@ import 'package:flutter_app/ExtensionProperty/ActivityNavigation.dart';
 import 'package:flutter_app/custom/CustomView.dart';
 import 'package:flutter_app/model/LoginBinding.dart';
 import 'package:flutter_app/model/BaseResponse.dart';
+import 'package:flutter_app/network_service/BaseRepository.dart';
 import 'package:flutter_app/network_service/HttpService.dart';
+import 'package:flutter_app/view/FetchAlbum.dart';
 import 'network_service/KeyRequest.dart';
 import 'view/SecondRoute.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
+import 'network_service/BaseRepository.dart';
 
 void main() {
   runApp(MaterialApp(home: MyApp()));
@@ -46,12 +49,12 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController passwordController = new TextEditingController();
   BaseResponse user;
   LoginBinding loginBinding;
+  Future<StateRepository> futureState;
 
-  Future<http.Response> createAlbum() {
-    return http.post(
-      'https://api.ihp.dev.intelin.vn/user/login',
-      body: loginBinding.toJson(),
-    );
+  @override
+  void initState() {
+    super.initState();
+    futureState = get(KeyRequest.GET_SOMETHING, "200");
   }
 
   void _incrementCounter() {
@@ -74,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     loginBinding = new LoginBinding(
       username: usernameController.text,
       password:
-          "cI1eVifkKE9E0P8lHOuWvhkOa3aSD+PFvcf8tFB/+pK9N8bjU33aw3hl7kgWuiZ5Y2lPDwvVELJjYtO4V6d8+ihtv4A5HhFnwbbg++E/yawmuJq4VV2LRoudBZ4rj1hmCAGu3BJqaJF0eZX6NAsmgN/NCpLRkQlSQkE3vviBd7F0Gvzsj7m5ER7G8jFN3bpqUASPUo6UhVBBLeLE+k/w0/0IT0NBlKOGidXoX2cb5HLgHx6q8+JO7llKPsI7WI1YGsYuEsqDbTxuEkpX+7ZHD+e9F94l7GIy5ujIRXt1yVD2cKTt9gGOHT2vKwI6Dcw6CTBYWJVVDPt5X0nG63YLcg==",
+      "cI1eVifkKE9E0P8lHOuWvhkOa3aSD+PFvcf8tFB/+pK9N8bjU33aw3hl7kgWuiZ5Y2lPDwvVELJjYtO4V6d8+ihtv4A5HhFnwbbg++E/yawmuJq4VV2LRoudBZ4rj1hmCAGu3BJqaJF0eZX6NAsmgN/NCpLRkQlSQkE3vviBd7F0Gvzsj7m5ER7G8jFN3bpqUASPUo6UhVBBLeLE+k/w0/0IT0NBlKOGidXoX2cb5HLgHx6q8+JO7llKPsI7WI1YGsYuEsqDbTxuEkpX+7ZHD+e9F94l7GIy5ujIRXt1yVD2cKTt9gGOHT2vKwI6Dcw6CTBYWJVVDPt5X0nG63YLcg==",
     );
     final http.Response response = await http.post(
       'https://api.ihp.dev.intelin.vn/user/login',
@@ -84,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print("call api response =  ${response.body}");
       BaseResponse base = BaseResponse.fromJson(json.decode(response.body));
       if (base.code == "LOGIN_2000") {
-        pushPage(context, SecondRoute());
+        pushPage(context, FetchAlbumWidget());
       }
       print(base.data);
     } else {
@@ -105,8 +108,14 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.height * 1 / 4,
-                width: MediaQuery.of(context).size.width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 1 / 4,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
                 child: Image.asset(
                   "assets/images/component.png",
                   fit: BoxFit.contain,
@@ -114,8 +123,14 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Container(
                 alignment: Alignment.topCenter,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 3 / 4,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 3 / 4,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -146,6 +161,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           iconEnd: Icon(Icons.ac_unit),
                           isPassword: true),
                     ),
+                    FutureBuilder<StateRepository>(
+                      future: futureState,
+                      builder: (context, snapshot) {
+                       return snapshot.data.use(
+                                (loading) => CircularProgressIndicator(),
+                                (success) => Text(success.baseResponse.code),
+                                (error) =>  Text(error.error));
+                      },
+                    ),
                     _buildColumnBottom(),
                   ],
                 ),
@@ -156,7 +180,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Column _buildColumnBottom() {
-    Color colorButton = Theme.of(context).primaryColor;
+    Color colorButton = Theme
+        .of(context)
+        .primaryColor;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -170,7 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Text(
             "Test something",
             style:
-                TextStyle(fontSize: 20, color: Theme.of(context).accentColor),
+            TextStyle(fontSize: 20, color: Theme
+                .of(context)
+                .accentColor),
           ),
         ),
       ],
